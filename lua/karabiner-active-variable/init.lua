@@ -27,7 +27,9 @@ local function executable(path)
   return vim.fn.executable(path) == 1
 end
 
-local function set_variable(value)
+local function set_variable(value, opts)
+  opts = opts or {}
+
   local cli_path = state.config.karabiner_cli_path
   if not executable(cli_path) then
     notify_once(
@@ -41,6 +43,21 @@ local function set_variable(value)
   local payload = vim.json.encode({
     [state.config.karabiner_variable_name] = value,
   })
+
+  if opts.sync then
+    vim.fn.system({ cli_path, "--set-variables", payload })
+
+    if vim.v.shell_error == 0 then
+      return
+    end
+
+    notify_once(
+      "notified_job_failure",
+      string.format("karabiner-active-variable.nvim: failed to update Karabiner variable (exit code %d)", vim.v.shell_error),
+      vim.log.levels.WARN
+    )
+    return
+  end
 
   local job_id = vim.fn.jobstart({ cli_path, "--set-variables", payload }, {
     on_exit = function(_, code)
@@ -81,7 +98,12 @@ function M.setup(opts)
 
   vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend", "VimLeavePre" }, {
     group = group,
-    callback = function()
+    callback = function(event)
+      if event.event == "VimLeavePre" then
+        set_variable(false, { sync = true })
+        return
+      end
+
       set_variable(false)
     end,
   })

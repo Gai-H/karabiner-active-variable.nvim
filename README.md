@@ -53,7 +53,7 @@ The plugin updates the Karabiner variable on these Neovim events:
 - `VimSuspend`: set `false`
 - `VimLeavePre`: set `false`
 
-Repeated updates to the same value are skipped.
+The plugin does not keep internal active/inactive state. It sends the configured value on each matching event.
 
 ## Karabiner-Elements Example
 

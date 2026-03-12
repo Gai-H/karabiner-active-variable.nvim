@@ -7,7 +7,6 @@ local defaults = {
 
 local state = {
   config = vim.deepcopy(defaults),
-  last_value = nil,
   notified_missing_cli = false,
   notified_job_failure = false,
 }
@@ -29,10 +28,6 @@ local function executable(path)
 end
 
 local function set_variable(value)
-  if state.last_value == value then
-    return
-  end
-
   local cli_path = state.config.karabiner_cli_path
   if not executable(cli_path) then
     notify_once(
@@ -42,8 +37,6 @@ local function set_variable(value)
     )
     return
   end
-
-  state.last_value = value
 
   local payload = vim.json.encode({
     [state.config.karabiner_variable_name] = value,
@@ -55,7 +48,6 @@ local function set_variable(value)
         return
       end
 
-      state.last_value = nil
       notify_once(
         "notified_job_failure",
         string.format("karabiner-active-variable.nvim: failed to update Karabiner variable (exit code %d)", code),
@@ -65,7 +57,6 @@ local function set_variable(value)
   })
 
   if job_id <= 0 then
-    state.last_value = nil
     notify_once(
       "notified_job_failure",
       "karabiner-active-variable.nvim: failed to start karabiner_cli",
@@ -76,7 +67,6 @@ end
 
 function M.setup(opts)
   state.config = vim.tbl_deep_extend("force", vim.deepcopy(defaults), opts or {})
-  state.last_value = nil
   state.notified_missing_cli = false
   state.notified_job_failure = false
 

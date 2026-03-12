@@ -123,12 +123,30 @@ local function clear_stale_lock_if_needed()
   return true
 end
 
+local function try_create_lock_dir()
+  local ok, result = pcall(vim.fn.mkdir, LOCK_PATH)
+  if ok then
+    return result == 1, nil
+  end
+
+  local err = tostring(result)
+  if err:match("E739") or err:match("file already exists") then
+    return false, "already_exists"
+  end
+
+  return false, err
+end
+
 local function acquire_lock()
   for _ = 1, LOCK_RETRY_COUNT do
-    local ok = vim.fn.mkdir(LOCK_PATH) == 1
-    if ok then
+    local created, err = try_create_lock_dir()
+    if created then
       write_lock_owner_pid()
       return true
+    end
+
+    if err ~= nil and err ~= "already_exists" then
+      error(string.format("failed to create lock directory: %s", err))
     end
 
     clear_stale_lock_if_needed()

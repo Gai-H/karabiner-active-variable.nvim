@@ -8,7 +8,7 @@ This plugin updates a Karabiner variable to `true` when Neovim is active, and re
 
 - macOS
 - [Karabiner-Elements](https://karabiner-elements.pqrs.org/)
-- Neovim with Lua support
+- Neovim
 
 ## Installation
 
@@ -19,9 +19,7 @@ Basic setup:
 ```lua
 {
   "Gai-H/karabiner-active-variable.nvim",
-  config = function()
-    require("karabiner-active-variable").setup()
-  end,
+  opts = {}
 }
 ```
 
@@ -33,33 +31,16 @@ With options:
   opts = {
     karabiner_variable_name = "neovim_active",
     karabiner_cli_path = "/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli",
-  },
-  config = function(_, opts)
-    require("karabiner-active-variable").setup(opts)
-  end,
+  }
 }
 ```
 
-## Configuration
+## Options
 
-Default configuration:
-
-```lua
-require("karabiner-active-variable").setup({
-  karabiner_variable_name = "neovim_active",
-  karabiner_cli_path = "/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli",
-})
-```
-
-### Options
-
-| Option | Type | Default |
-| --- | --- | --- |
-| `karabiner_variable_name` | `string` | `neovim_active` |
-| `karabiner_cli_path` | `string` | `/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli` |
-
-- `karabiner_variable_name`: Karabiner variable name to update
-- `karabiner_cli_path`: Path to `karabiner_cli`
+| Option | Type | Description | Default |
+| --- | --- | --- | --- |
+| `karabiner_variable_name` | `string` | Name of the variable | `neovim_active` |
+| `karabiner_cli_path` | `string` | Path to the Karabiner-Elements CLI | `/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli` |
 
 ## How It Works
 

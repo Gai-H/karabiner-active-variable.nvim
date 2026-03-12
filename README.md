@@ -53,7 +53,11 @@ The plugin updates the Karabiner variable on these Neovim events:
 - `VimSuspend`: set `false`
 - `VimLeavePre`: set `false`
 
-The plugin does not keep internal active/inactive state. It sends the configured value on each matching event.
+Each Neovim instance stores its own active state in a shared file at `/tmp/karabiner-active-variable.nvim.json`.
+
+The plugin aggregates all tracked instances and sets the Karabiner variable to `true` if any instance is active, or `false` otherwise.
+
+Updates are serialized with a lock directory at `/tmp/karabiner-active-variable.nvim.lock`, and stale entries are removed by checking whether their recorded pids are still alive.
 
 ## Karabiner-Elements Example
 
@@ -112,3 +116,5 @@ Example manipulator:
 - `FocusGained` and `FocusLost` depend on terminal focus reporting support.
 - If `karabiner_cli` is not found or exits with an error, the plugin shows a warning once.
 - The variable is boolean, so use `true` and `false` in your Karabiner conditions.
+- Shared state is stored in `/tmp/karabiner-active-variable.nvim.json`.
+- A lock directory is created at `/tmp/karabiner-active-variable.nvim.lock` while shared state is being updated.

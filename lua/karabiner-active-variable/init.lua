@@ -49,15 +49,17 @@ function M.setup(opts)
     end,
   })
 
-  vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend", "VimLeavePre" }, {
+  vim.api.nvim_create_autocmd({ "FocusLost", "VimSuspend" }, {
     group = group,
-    callback = function(event)
-      if event.event == "VimLeavePre" then
-        sync_state(false, { sync = true })
-        return
-      end
-
+    callback = function()
       sync_state(false)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "VimLeavePre" }, {
+    group = group,
+    callback = function()
+      sync_state(false, { sync = true })
     end,
   })
 

@@ -116,5 +116,4 @@ Example manipulator:
 - `FocusGained` and `FocusLost` depend on terminal focus reporting support.
 - If `karabiner_cli` is not found or exits with an error, the plugin shows a warning once.
 - The variable is boolean, so use `true` and `false` in your Karabiner conditions.
-- Shared state is stored in `/tmp/karabiner-active-variable.nvim.json`.
-- A lock directory is created at `/tmp/karabiner-active-variable.nvim.lock` while shared state is being updated.
+

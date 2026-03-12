@@ -5,6 +5,8 @@ local LOCK_PATH = "/tmp/karabiner-active-variable.nvim.lock"
 local LOCK_OWNER_PATH = LOCK_PATH .. "/owner_pid"
 local LOCK_RETRY_COUNT = 5
 local LOCK_RETRY_DELAY_MS = 20
+local LOCK_OWNER_RETRY_COUNT = 3
+local LOCK_OWNER_RETRY_DELAY_MS = 10
 
 local function current_pid()
   return tostring(vim.fn.getpid())
@@ -105,6 +107,19 @@ local function read_lock_owner_pid()
   return vim.trim(content)
 end
 
+local function wait_for_lock_owner_pid()
+  for _ = 1, LOCK_OWNER_RETRY_COUNT do
+    local owner_pid = read_lock_owner_pid()
+    if owner_pid and owner_pid ~= "" then
+      return owner_pid
+    end
+
+    sleep_ms(LOCK_OWNER_RETRY_DELAY_MS)
+  end
+
+  return nil
+end
+
 local function write_lock_owner_pid()
   write_file(LOCK_OWNER_PATH, current_pid())
 end
@@ -114,7 +129,7 @@ local function clear_stale_lock_if_needed()
     return false
   end
 
-  local owner_pid = read_lock_owner_pid()
+  local owner_pid = wait_for_lock_owner_pid()
   if owner_pid and pid_is_alive(owner_pid) then
     return false
   end
